@@ -117,12 +117,11 @@ def human_readable_bytes(value: int, digits: int = 2, delim: str = "", postfix: 
     hr_value: float = value
     chosen_unit = "B"
     for unit in ("KiB", "MiB", "GiB", "TiB"):
-        if hr_value > 1000:
-            hr_value /= 1024
-            chosen_unit = unit
-        else:
+        if hr_value <= 1000:
             break
-    return f"{hr_value:.{digits}f}" + delim + chosen_unit + postfix  # noqa: WPS221 (not complex)
+        hr_value /= 1024
+        chosen_unit = unit
+    return f"{hr_value:.{digits}f}{delim}{chosen_unit}{postfix}"
 
 
 def bool_or_value(value) -> Any:
@@ -237,9 +236,7 @@ def load_configuration() -> Dict[str, Any]:
         STATUS_WAITING = "WHITE BOLD DEFAULT"
     """
 
-    config_dict = {}
-    config_dict["DEFAULT"] = toml.loads(default_config)
-
+    config_dict = {"DEFAULT": toml.loads(default_config)}
     # Check for configuration file
     config_file_path = Path(user_config_dir("aria2p")) / "config.toml"
 

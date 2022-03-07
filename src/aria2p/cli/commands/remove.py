@@ -21,20 +21,17 @@ def remove(api: API, gids: List[str] = None, do_all: bool = False, force: bool =
         int: 0 if all success, 1 if one failure.
     """
     if do_all:
-        if api.remove_all():
-            return 0
-        return 1
-
+        return 0 if api.remove_all() else 1
     try:
         downloads = api.get_downloads(gids)
     except ClientException as error:
-        print(str(error), file=sys.stderr)
+        print(error, file=sys.stderr)
         return 1
 
-    ok = True
     result = api.remove(downloads, force=force)
 
     if all(result):
+        ok = True
         return 0 if ok else 1
 
     for item in result:

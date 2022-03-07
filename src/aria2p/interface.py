@@ -295,7 +295,7 @@ class Palette:
     @staticmethod
     def status(value):
         """Return the palette for a STATUS cell."""
-        return "status_" + value
+        return f"status_{value}"
 
     @staticmethod
     def name(value):
@@ -522,7 +522,7 @@ class Interface:
                             try:
                                 self.process_event(event)
                             except Exit:
-                                logger.debug(f"Received exit command")
+                                logger.debug("Received exit command")
                                 return True
                             except Exception as error:
                                 # TODO: display error in status bar
@@ -532,14 +532,14 @@ class Interface:
 
                         # time to update data and rows
                         if self.frame == 0:
-                            logger.debug(f"Tick! Updating data and rows")
+                            logger.debug("Tick! Updating data and rows")
                             self.update_data()
                             self.update_rows()
                             self.refresh = True
 
                         # time to refresh the screen
                         if self.refresh:
-                            logger.debug(f"Refresh! Printing text")
+                            logger.debug("Refresh! Printing text")
                             # sort if needed, unless it was just done at frame 0 when updating
                             if (self.sort, self.reverse) != previous_sort and self.frame != 0:
                                 self.sort_data()
@@ -560,7 +560,7 @@ class Interface:
             return False
 
     def post_resize(self):
-        logger.debug(f"Running post-resize function")
+        logger.debug("Running post-resize function")
         logger.debug("Trying to re-apply pywal color theme")
         wal_sequences = Path.home() / ".cache" / "wal" / "sequences"
         try:
@@ -736,8 +736,7 @@ class Interface:
             if self.focused > 0:
                 self.focused -= len(self.rows) // 5
 
-                if self.focused < 0:
-                    self.focused = 0
+                self.focused = max(self.focused, 0)
                 logger.debug(f"Move focus up (step): {self.focused}")
 
                 if self.focused < self.row_offset:
@@ -784,9 +783,12 @@ class Interface:
             self.x_offset = self.width
 
             # build set of copied lines
-            copied_lines = set()
-            for line in pyperclip.paste().split("\n") + pyperclip.paste(primary=True).split("\n"):
-                copied_lines.add(line.strip())
+            copied_lines = {
+                line.strip()
+                for line in pyperclip.paste().split("\n")
+                + pyperclip.paste(primary=True).split("\n")
+            }
+
             try:
                 copied_lines.remove("")
             except KeyError:

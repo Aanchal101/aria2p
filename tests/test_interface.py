@@ -224,11 +224,7 @@ def test_log_exception(tmp_path, port, monkeypatch):
         assert not interface.run()
     with open(Path("tests") / "logs" / "test_interface" / "test_log_exception.log") as log_file:
         lines = log_file.readlines()
-    first_line = None
-    for line in lines:
-        if "ERROR" in line:
-            first_line = line
-            break
+    first_line = next((line for line in lines if "ERROR" in line), None)
     last_line = lines[-1]
     assert "some message" in first_line
     assert "LookupError" in last_line
@@ -414,11 +410,7 @@ def test_click_out_bounds(server, monkeypatch):
     )
     with open(Path("tests") / "logs" / "test_interface" / "test_click_out_bounds.log") as log_file:
         lines = log_file.readlines()
-    error_line = None
-    for line in lines:
-        if "ERROR" in line:
-            error_line = line
-            break
+    error_line = next((line for line in lines if "ERROR" in line), None)
     assert error_line
     assert "clicked outside of boundaries" in error_line
 

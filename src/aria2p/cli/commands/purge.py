@@ -13,6 +13,4 @@ def purge(api: API) -> int:
     Returns:
         int: 0 if all success, 1 if one failure.
     """
-    if api.autopurge():
-        return 0
-    return 1
+    return 0 if api.autopurge() else 1

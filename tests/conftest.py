@@ -21,12 +21,10 @@ def tests_logs(request):
     # put logs in tests/logs
     log_path = Path("tests") / "logs"
 
-    # tidy logs in subdirectories based on test module and class names
-    module = request.module
     class_ = request.cls
-    name = request.node.name + ".log"
+    name = f'{request.node.name}.log'
 
-    if module:
+    if module := request.module:
         log_path /= module.__name__.replace("tests.", "")
     if class_:
         log_path /= class_.__name__
@@ -105,23 +103,20 @@ class _Aria2Server:
             "--enable-rpc=true",
             f"--rpc-listen-port={self.port}",
         ]
-        if config:
-            command.append(f"--conf-path={config}")
-        else:
+        if not config:
             # command.append("--no-conf")
             config = CONFIGS_DIR / "default.conf"
-            command.append(f"--conf-path={config}")
+        command.append(f"--conf-path={config}")
         if session:
             if isinstance(session, list):
                 session_path = self.tmp_dir / "_session.txt"
                 with open(session_path, "w") as stream:
                     stream.write("\n".join(session))
-                command.append(f"--input-file={session_path}")
             else:
                 session_path = SESSIONS_DIR / session
                 if not session_path.exists():
                     raise ValueError(f"no such session: {session}")
-                command.append(f"--input-file={session_path}")
+            command.append(f"--input-file={session_path}")
         if secret:
             command.append(f"--rpc-secret={secret}")
 

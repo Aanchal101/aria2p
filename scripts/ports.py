@@ -13,8 +13,7 @@ def get_ports():
     for test_file in test_files:
         with test_file.open() as test_code:
             for lineno, line in enumerate(test_code, 1):
-                match = port_regex.search(line)
-                if match:
+                if match := port_regex.search(line):
                     port = int(match.group().replace("port=", ""))
                     used_ports[port].append((str(test_file), lineno, line.strip()))
     return used_ports
@@ -44,20 +43,18 @@ def get_unused(ports):
     sorted_ports = list(sorted(ports.keys()))
     following = False
     for candidate in range(sorted_ports[0], sorted_ports[-1] + 2):
-        if candidate not in sorted_ports:
-            if following and candidate not in blacklisted_ports:
-                finalists.append(candidate)
-                following = False
-        else:
+        if candidate in sorted_ports:
             following = True
+        elif following and candidate not in blacklisted_ports:
+            finalists.append(candidate)
+            following = False
     return finalists
 
 
 def next_unused(port):
-    for next_port in unused_ports:
-        if next_port > port:
-            return next_port
-    return None
+    return next(
+        (next_port for next_port in unused_ports if next_port > port), None
+    )
 
 
 if __name__ == "__main__":

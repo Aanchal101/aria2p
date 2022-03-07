@@ -294,8 +294,7 @@ class API:
         downloads = []
 
         if gids:
-            for gid in gids:
-                downloads.append(Download(self, self.client.tell_status(gid)))
+            downloads.extend(Download(self, self.client.tell_status(gid)) for gid in gids)
         else:
             structs = []
             structs.extend(self.client.tell_active())
@@ -443,11 +442,7 @@ class API:
             Success or failure of the operation for each given download.
         """
         # Note: batch/multicall candidate
-        if force:
-            remove_func = self.client.force_remove
-        else:
-            remove_func = self.client.remove
-
+        remove_func = self.client.force_remove if force else self.client.remove
         result: List[OperationResult] = []
 
         for download in downloads:
@@ -524,11 +519,7 @@ class API:
             Success or failure of the operation for each given download.
         """
         # Note: batch/multicall candidate
-        if force:
-            pause_func = self.client.force_pause
-        else:
-            pause_func = self.client.pause
-
+        pause_func = self.client.force_pause if force else self.client.pause
         result: List[OperationResult] = []
 
         for download in downloads:
@@ -553,10 +544,7 @@ class API:
         Returns:
             Success or failure of the operation to pause all downloads.
         """
-        if force:
-            pause_func = self.client.force_pause_all
-        else:
-            pause_func = self.client.pause_all
+        pause_func = self.client.force_pause_all if force else self.client.pause_all
         return pause_func() == "OK"
 
     def resume(self, downloads: List[Download]) -> List[OperationResult]:
@@ -624,11 +612,10 @@ class API:
         Returns:
             Options object for each given download.
         """
-        # Note: batch/multicall candidate
-        options = []
-        for download in downloads:
-            options.append(Options(self, self.client.get_option(download.gid), download))
-        return options
+        return [
+            Options(self, self.client.get_option(download.gid), download)
+            for download in downloads
+        ]
 
     def get_global_options(self) -> Options:
         """
@@ -656,11 +643,10 @@ class API:
         else:
             client_options = options
 
-        # Note: batch/multicall candidate
-        results = []
-        for download in downloads:
-            results.append(self.client.change_option(download.gid, client_options) == "OK")
-        return results
+        return [
+            self.client.change_option(download.gid, client_options) == "OK"
+            for download in downloads
+        ]
 
     def set_global_options(self, options: OptionsType) -> bool:
         """
@@ -866,7 +852,7 @@ class API:
             self.listener.join()
         self.listener = None
 
-    def split_input_file(self, lines):  # noqa: WPS231 (not complex)
+    def split_input_file(self, lines):    # noqa: WPS231 (not complex)
         """
         Helper to split downloads in an input file.
 
@@ -882,10 +868,9 @@ class API:
                 continue
             if not line.strip():  # Ignore empty line
                 continue
-            if not line.startswith(" "):  # URIs line
-                if block:
-                    yield block
-                    block = []
+            if not line.startswith(" ") and block:
+                yield block
+                block = []
             block.append(line.rstrip("\n"))
         if block:
             yield block

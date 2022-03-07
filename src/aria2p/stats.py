@@ -41,7 +41,7 @@ class Stats:
         """
         if human_readable:
             return human_readable_bytes(self.download_speed, delim=" ", postfix="/s")
-        return str(self.download_speed) + " B/s"
+        return f'{str(self.download_speed)} B/s'
 
     @property
     def upload_speed(self) -> int:
@@ -65,7 +65,7 @@ class Stats:
         """
         if human_readable:
             return human_readable_bytes(self.upload_speed, delim=" ", postfix="/s")
-        return str(self.upload_speed) + " B/s"
+        return f'{str(self.upload_speed)} B/s'
 
     @property
     def num_active(self) -> int:
