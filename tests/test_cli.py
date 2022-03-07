@@ -71,7 +71,7 @@ def test_parser_error_when_no_gid_and_no_all_option(capsys):
             main([alias])
             assert e.value.code == 2
         lines = err_lines(capsys)
-        assert lines[0].startswith("usage: aria2p " + command)
+        assert lines[0].startswith(f"usage: aria2p {command}")
         assert lines[1].endswith("the following arguments are required: gids or --all")
 
     for command, aliases in [

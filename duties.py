@@ -25,17 +25,20 @@ PTY = not WINDOWS and not CI
 
 def _latest(lines: List[str], regex: Pattern) -> Optional[str]:
     for line in lines:
-        match = regex.search(line)
-        if match:
+        if match := regex.search(line):
             return match.groupdict()["version"]
     return None
 
 
 def _unreleased(versions, last_release):
-    for index, version in enumerate(versions):
-        if version.tag == last_release:
-            return versions[:index]
-    return versions
+    return next(
+        (
+            versions[:index]
+            for index, version in enumerate(versions)
+            if version.tag == last_release
+        ),
+        versions,
+    )
 
 
 def update_changelog(
@@ -74,8 +77,7 @@ def update_changelog(
     with open(inplace_file, "r") as changelog_file:
         lines = changelog_file.read().splitlines()
 
-    last_released = _latest(lines, re.compile(version_regex))
-    if last_released:
+    if last_released := _latest(lines, re.compile(version_regex)):
         changelog.versions_list = _unreleased(changelog.versions_list, last_released)
     rendered = template.render(changelog=changelog, inplace=True)
     lines[lines.index(marker)] = rendered
@@ -222,7 +224,7 @@ def check_docs(ctx):
 
 
 @duty  # noqa: WPS231
-def check_types(ctx):  # noqa: WPS231
+def check_types(ctx):    # noqa: WPS231
     """
     Check that the code is correctly typed.
 
@@ -237,10 +239,12 @@ def check_types(ctx):  # noqa: WPS231
     pkgs_dir = Path("__pypackages__", py, "lib").resolve()
 
     # build the list of available packages
-    packages = {}
-    for package in pkgs_dir.glob("*"):
-        if package.suffix not in {".dist-info", ".pth"} and package.name != "__pycache__":
-            packages[package.name] = package
+    packages = {
+        package.name: package
+        for package in pkgs_dir.glob("*")
+        if package.suffix not in {".dist-info", ".pth"}
+        and package.name != "__pycache__"
+    }
 
     # handle .pth files
     for pth in pkgs_dir.glob("*.pth"):
@@ -420,9 +424,9 @@ def test(ctx, match="", markers="", cpus="auto", sugar: bool = True, verbose: bo
         cov_opts = ["--no-cov"]
     else:
         cpus_opts = ["--dist", "no"] if cpus == "no" else ["-n", cpus]
-        sugar_opts = [] if sugar is True else ["-p", "no:sugar"]
-        verbose_opts = [] if verbose is False else ["-vv"]
-        cov_opts = [] if cov is True else ["--no-cov"]
+        sugar_opts = [] if sugar else ["-p", "no:sugar"]
+        verbose_opts = [] if not verbose else ["-vv"]
+        cov_opts = [] if cov else ["--no-cov"]
 
     match = ["-k", match] if match else []
     markers = ["-m", markers] if markers else []

@@ -61,8 +61,7 @@ def listen(
         "on_bt_download_complete",
     ):
         if callback_name[3:].replace("download", "").replace("_", "") in event_types:
-            callback = getattr(callbacks, callback_name, None)
-            if callback:
+            if callback := getattr(callbacks, callback_name, None):
                 callbacks_kwargs[callback_name] = callback
 
     api.listen_to_notifications(timeout=timeout, handle_signals=True, threaded=False, **callbacks_kwargs)

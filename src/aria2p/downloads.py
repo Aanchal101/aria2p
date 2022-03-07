@@ -164,7 +164,7 @@ class File:
         """
         if human_readable:
             return human_readable_bytes(self.length, delim=" ")
-        return str(self.length) + " B"
+        return f'{str(self.length)} B'
 
     @property
     def completed_length(self) -> int:
@@ -192,7 +192,7 @@ class File:
         """
         if human_readable:
             return human_readable_bytes(self.completed_length, delim=" ")
-        return str(self.completed_length) + " B"
+        return f'{str(self.completed_length)} B'
 
     @property
     def selected(self) -> bool:
@@ -309,7 +309,7 @@ class Download:
         Returns:
             The control file path.
         """
-        return self.dir / (self.name + ".aria2")
+        return self.dir / f'{self.name}.aria2'
 
     @property  # noqa: WPS231 (not that complex)
     def root_files_paths(self) -> List[Path]:  # noqa: WPS231
@@ -493,7 +493,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.total_length, delim=" ")
-        return str(self.total_length) + " B"
+        return f'{str(self.total_length)} B'
 
     @property
     def completed_length(self) -> int:
@@ -517,7 +517,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.completed_length, delim=" ")
-        return str(self.completed_length) + " B"
+        return f'{str(self.completed_length)} B'
 
     @property
     def upload_length(self) -> int:
@@ -541,7 +541,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.upload_length, delim=" ")
-        return str(self.upload_length) + " B"
+        return f'{str(self.upload_length)} B'
 
     @property
     def bitfield(self) -> Optional[str]:
@@ -579,7 +579,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.download_speed, delim=" ", postfix="/s")
-        return str(self.download_speed) + " B/s"
+        return f'{str(self.download_speed)} B/s'
 
     @property
     def upload_speed(self) -> int:
@@ -603,7 +603,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.upload_speed, delim=" ", postfix="/s")
-        return str(self.upload_speed) + " B/s"
+        return f'{str(self.upload_speed)} B/s'
 
     @property
     def info_hash(self) -> Optional[str]:
@@ -663,7 +663,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.piece_length, delim=" ")
-        return str(self.piece_length) + " B"
+        return f'{str(self.piece_length)} B'
 
     @property
     def num_pieces(self) -> int:
@@ -764,8 +764,7 @@ class Download:
             An instance of [`Download`][aria2p.downloads.Download].
         """
         if not self._following:
-            following_id = self.following_id
-            if following_id:
+            if following_id := self.following_id:
                 try:
                     self._following = self.api.get_download(following_id)
                 except ClientException as error:
@@ -799,8 +798,7 @@ class Download:
             An instance of [`Download`][aria2p.downloads.Download].
         """
         if not self._belongs_to:
-            belongs_to_id = self.belongs_to_id
-            if belongs_to_id:
+            if belongs_to_id := self.belongs_to_id:
                 try:
                     self._belongs_to = self.api.get_download(belongs_to_id)
                 except ClientException as error:
@@ -873,7 +871,7 @@ class Download:
         """
         if human_readable:
             return human_readable_bytes(self.verified_length, delim=" ")
-        return str(self.verified_length) + " B"
+        return f'{str(self.verified_length)} B'
 
     @property
     def verify_integrity_pending(self) -> Optional[bool]:

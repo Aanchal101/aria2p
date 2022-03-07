@@ -27,7 +27,7 @@ def resume(api: API, gids: List[str] = None, do_all: bool = False) -> int:
     try:
         downloads = api.get_downloads(gids)
     except ClientException as error:
-        print(str(error), file=sys.stderr)
+        print(error, file=sys.stderr)
         return 1
 
     result = api.resume(downloads)

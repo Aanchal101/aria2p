@@ -311,7 +311,7 @@ class TestClientClass:
     def test_force_shutdown_method(self, server):
         assert server.client.force_shutdown() == "OK"
         with pytest.raises(requests.ConnectionError):
-            for retry in range(10):
+            for _ in range(10):
                 server.client.list_methods()
                 time.sleep(1)
 
@@ -422,7 +422,7 @@ class TestClientClass:
     def test_shutdown_method(self, server):
         assert server.client.shutdown() == "OK"
         with pytest.raises(requests.ConnectionError):
-            for retry in range(10):
+            for _ in range(10):
                 server.client.list_methods()
                 time.sleep(1)
 
@@ -484,7 +484,9 @@ class TestClientClass:
 
             def thread_target():
                 server.client.listen_to_notifications(
-                    on_download_start=lambda gid: print("started " + gid), timeout=1, handle_signals=False
+                    on_download_start=lambda gid: print(f"started {gid}"),
+                    timeout=1,
+                    handle_signals=False,
                 )
 
             thread = threading.Thread(target=thread_target)

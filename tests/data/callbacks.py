@@ -1,6 +1,6 @@
 def on_download_start(api, gid):
-    print("started " + gid)
+    print(f"started {gid}")
 
 
 def on_download_pause(api, gid):
-    print("paused " + gid)
+    print(f"paused {gid}")

@@ -408,12 +408,12 @@ class Client:
         Returns:
             The payload as a JSON string or as Python dictionary.
         """
-        payload = {"jsonrpc": "2.0", "method": method}
+        payload = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "id": msg_id if msg_id is not None else DEFAULT_ID,
+        }
 
-        if msg_id is not None:
-            payload["id"] = msg_id
-        else:
-            payload["id"] = DEFAULT_ID
 
         if params:
             payload["params"] = params

@@ -69,9 +69,7 @@ def main(args: Optional[List[str]] = None) -> int:
     kwargs = opts.__dict__  # noqa: WPS609 (special attribute)
 
     log_level = kwargs.pop("log_level")
-    log_path = kwargs.pop("log_path")
-
-    if log_path:
+    if log_path := kwargs.pop("log_path"):
         log_path = Path(log_path)
         if log_path.is_dir():
             log_path = log_path / "aria2p-{time}.log"
@@ -109,9 +107,9 @@ def main(args: Optional[List[str]] = None) -> int:
     subcommand = kwargs.pop("subcommand")
 
     if subcommand:
-        logger.debug("Running subcommand " + subcommand)
+        logger.debug(f"Running subcommand {subcommand}")
     try:
         return commands[subcommand](api, **kwargs)  # type: ignore
     except ClientException as error:  # noqa: WPS440 (variable overlap)
-        print(str(error), file=sys.stderr)
+        print(error, file=sys.stderr)
         return error.code
